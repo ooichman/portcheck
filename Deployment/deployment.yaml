@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portcheck
+  labels:
+    app: portcheck
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: portcheck
+  template:
+    metadata:
+      labels:
+        app: portcheck
+    spec:
+      containers:
+      - name: portcheck
+        image: image-registry.openshift-image-registry.svc:5000/portcheck/portcheck:latest
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
