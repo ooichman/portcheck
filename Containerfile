@@ -1,29 +1,17 @@
-FROM ubi8/ubi
-MAINTAINER Oren Oichman <Back to Root>
+FROM golang:alpine as build
 
-RUN dnf install -y nc httpd mod_ssl jq && \
-        dnf clean all
+WORKDIR /opt/app-root
+ENV GOPATH=/opt/app-root/
+COPY src src
+WORKDIR /opt/app-root/src/port-check/
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o portcheck
 
-COPY run-httpd.sh /usr/sbin/run-httpd.sh
-RUN echo "PidFile /tmp/http.pid" >> /etc/httpd/conf/httpd.conf
-RUN sed -i "s/Listen\ 80/Listen\ 8080/g"  /etc/httpd/conf/httpd.conf
-RUN sed -i "s/\"logs\/error_log\"/\/dev\/stderr/g" /etc/httpd/conf/httpd.conf
-RUN sed -i "s/CustomLog \"logs\/access_log\"/CustomLog \/dev\/stdout/g" /etc/httpd/conf/httpd.conf
-RUN echo 'ScriptSock /tmp/cgid.sock' >> /etc/httpd/conf/httpd.conf
-RUN echo 'IncludeOptional /opt/app-root/*.conf' >> /etc/httpd/conf/httpd.conf && \
-         rm -f /etc/httpd/conf.d/ssl.conf && \
-         mkdir /opt/app-root/ && \
-         chown apache:apache /opt/app-root/ && \
-         chmod 777 /opt/app-root/
+FROM scratch
 
-COPY cgi.conf /opt/app-root/
-RUN mkdir /opt/app-root/cgi-bin && \
-          chown apache:apache /opt/app-root/cgi-bin && \
-          chmod 777 /opt/app-root/cgi-bin
+WORKDIR /opt/app-root
+COPY --from=build /opt/app-root/src/port-check/portcheck /opt/app-root/portcheck
 
-COPY index.sh /opt/app-root/cgi-bin/
-USER apache
 
 EXPOSE 8080
-CMD ["/usr/sbin/run-httpd.sh"]
-ENTRYPOINT ["/usr/sbin/run-httpd.sh"]
+CMD ["/opt/app-root/portcheck"]
+ENTRYPOINT ["/opt/app-root/portcheck"]
