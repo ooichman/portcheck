@@ -16,12 +16,12 @@ spec:
     spec:
       containers:
       - name: spearedge
-        image: micro-registry.oichman.net/portcheck/spearedge:latest
+        image: registry.gitlab.com/two.oes/portcheck/spearedge:latest
         env:
           - name: DST_NAMESPACE
             value: "port-check"
           - name: POD_IMAGE
-            value: "micro-registry.oichman.net/portcheck/portcheck:latest"
+            value: "registry.gitlab.com/two.oes/portcheck/portcheck:latest"
         ports:
         - name: http
           containerPort: 8080
