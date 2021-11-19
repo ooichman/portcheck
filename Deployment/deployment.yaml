@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: portcheck
-        image: image-registry.openshift-image-registry.svc:5000/portcheck/portcheck:latest
+        image: micro-registry.oichman.net/portcheck/port-check
         ports:
         - name: http
           containerPort: 8080

@@ -12,14 +12,14 @@ import (
 )
 
 type Postinput struct {
-	port string `json:"port"`
-	target string `json:"target"`
-	protocal string `json:"protocal"`
+	Port string `json:"port"`
+	Target string `json:"target"`
+	Protocol string `json:"protocol"`
 }
 
 type Postoutput struct {
-	status string `json:"status"`
-	message string `json:"message"`
+	Status string `json:"status"`
+	Message string `json:"message"`
 }
 
 func WebForm(w http.ResponseWriter, r *http.Request ) {
@@ -59,53 +59,60 @@ func portcheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
     
-    input := &Postinput{}
+    var input Postinput
 
-    if err := json.Unmarshal(Body, input); err != nil {
+    if err := json.Unmarshal(Body, &input); err != nil {
     	fmt.Fprintf(os.Stderr, "Unable to unmarshal the Body\n")
     	http.Error(w, "Unable to unmarshal the Body", http.StatusBadRequest)
     	return
+    } else {
+    	fmt.Fprintf(os.Stderr, "%+v\n", input)
     }
 
-    port := input.port
-    target := input.target
-    protocal := input.protocal
+    port := input.Port
+    target := input.Target
+    protocol := input.Protocol
 
     timeout := time.Second
-    conn , err := net.DialTimeout(protocal, net.JoinHostPort(target, port), timeout)
+    conn , err := net.DialTimeout(protocol, net.JoinHostPort(target, port), timeout)
 
-    postoutput := Postoutput{
-    	status: "Failure",
-    	message: "unable to reach request host on the request port",
+	if err != nil {
+    	fmt.Fprintf(os.Stderr, "Unable to Open Port %s to host %s on protocol : %s\n",port , target, protocol)
     }
 
+	contentType := r.Header.Get("Content-type")
+	fmt.Fprintf(os.Stdout, "%s\n", contentType)
 
-    if err != nil {
-    	fmt.Fprintf(os.Stderr, "Unable to Open Port %s to host %s on protocal : %s\n",port , target, protocal)
-    }
+    if contentType == "application/json" {
 
-	resp , err_resp := json.Marshal(postoutput)
+    	postoutput := Postoutput{
+    		Status: "Failure",
+    		Message: "unable to reach request host on the request port",
+    	}
 
-    if conn != nil {
-    	postoutput.status = "Success"
-    	postoutput.message = "the port is opened on the remote host"
+    	resp , err_resp := json.Marshal(postoutput)
 
-    	resp , err_resp = json.Marshal(postoutput)
+	    if conn != nil {
+    		postoutput.Status = "Success"
+    		postoutput.Message = "the port is opened on the remote host"
 
-    	fmt.Fprintf(os.Stdout, "Port %s/%s is open on remote host %s\n",port , protocal , target)
-    }
+    		resp , err_resp = json.Marshal(postoutput)
 
-    if err_resp != nil {
-    	fmt.Fprintf(os.Stderr, "Unable to Marshal the Request\n")
-    	http.Error(w, "Unable to Marshal the Request", http.StatusBadRequest)
+	    	fmt.Fprintf(os.Stdout, "Port %s/%s is open on remote host %s\n",port , protocol , target)
+   		 }
+
+  		if err_resp != nil {
+	    	fmt.Fprintf(os.Stderr, "Unable to Marshal the Request\n")
+ 		   	http.Error(w, "Unable to Marshal the Request", http.StatusBadRequest)
+	    	return
+   		}
+
+   		if _ , werr := w.Write(resp); werr != nil {
+   			fmt.Fprintf(os.Stderr, "Unable to Write the Response\n")
+   			http.Error(w, "Unable to Write Response", http.StatusBadRequest)    	
+   		}
     	return
     }
-
-   	if _ , werr := w.Write(resp); werr != nil {
-   		fmt.Fprintf(os.Stderr, "Unable to Write the Response\n")
-   		http.Error(w, "Unable to Write Response", http.StatusBadRequest)    	
-   	}
-    return
 }
 
 func main() {

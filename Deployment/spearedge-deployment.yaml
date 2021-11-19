@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spearedge
+  labels:
+    app: spearedge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spearedge
+  template:
+    metadata:
+      labels:
+        app: spearedge
+    spec:
+      containers:
+      - name: spearedge
+        image: micro-registry.oichman.net/portcheck/spearedge:latest
+        env:
+          - name: DST_NAMESPACE
+            value: "port-check"
+          - name: POD_IMAGE
+            value: "micro-registry.oichman.net/portcheck/portcheck:latest"
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+      serviceAccountName: spearedge
