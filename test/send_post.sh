@@ -27,4 +27,4 @@
 			'{"port": $rp ,"target": $ru , "protocol": "tcp" , "hostname", $oh}' )
 
       
-      curl -H "Content-type: application/json" -X POST -d "$JSONstring" $MY_URL
+      curl -s -H "Content-type: application/json" -X POST -d "$JSONstring" $MY_URL
