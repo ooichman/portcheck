@@ -98,4 +98,27 @@ Select on of the nodes and run the test :
 If you want to use it with a Web interface for delegation you can write it and just run the POST request from A web form
 
 
+### Disconnected environment
+
+For Disconnected environment we can do a few steps.
+
+First save the 2 images:
+
+    # podman save registry.gitlab.com/two.oes/portcheck/portcheck -o portcheck.tar
+    # podman save registry.gitlab.com/two.oes/portcheck/spearedge -o spearedge.tar
+
+Now you can take it (with the git repository) to the disconnected environment 
+
+#### What to change ?
+
+##### Only Portcheck
+
+For portcheck only just update the image referance in the portcheck-daemonset.yaml file
+
+##### Using spearedge
+
+In the spearedge deployment you can change the image reference and change the environment variable that points to the portcheck
+Image which it needs to pull.
+
+
 Have Fun !!!
