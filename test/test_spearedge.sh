@@ -5,7 +5,7 @@
 		exit
    fi
 
-   if [[ -z ${REMOTE_URL} ]]; then
+   if [[ -z ${REMOTE_HOST} ]]; then
 		echo "the variable REMOTE_URL is not defined"
 		exit
    fi
@@ -20,8 +20,12 @@
 		exit
 	fi
 
+   if [[ ${MY_URL} ! ~= "/checkport" ]]; then
+	MY_URL="${MY_URL}/checkport"
+   fi
+
 		JSONstring=$( jq -n \
-			--arg ru "${REMOTE_URL}" \
+			--arg ru "${REMOTE_HOST}" \
 			--arg oh "${OCP_HOSTNAME}" \
 			--arg rp "${DST_PORT}" \
 			'{"port": $rp ,"target": $ru , "protocol": "tcp" , "hostname", $oh}' )
