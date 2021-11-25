@@ -6,7 +6,7 @@
    fi
 
    if [[ -z ${REMOTE_HOST} ]]; then
-		echo "the variable REMOTE_URL is not defined"
+		echo "the variable REMOTE_HOST is not defined"
 		exit
    fi
 
@@ -15,12 +15,18 @@
    	exit
    fi
 
+   if [[ -z ${REMOTE_PROTO} ]]; then
+
+	echo "The Variable REMOTE_PROTO is not definded"
+	exit
+   fi
+
    if [[ -z ${OCP_HOSTNAME} ]]; then
 		echo "the variable OCP_HOSTNAME is not defined"
 		exit
 	fi
 
-   if [[ ${MY_URL} ! ~= "/checkport" ]]; then
+   if [[ ! ${MY_URL} =~ "/checkport" ]]; then
 	MY_URL="${MY_URL}/checkport"
    fi
 
@@ -28,7 +34,9 @@
 			--arg ru "${REMOTE_HOST}" \
 			--arg oh "${OCP_HOSTNAME}" \
 			--arg rp "${DST_PORT}" \
-			'{"port": $rp ,"target": $ru , "protocol": "tcp" , "hostname", $oh}' )
+                        --arg pr "${REMOTE_PROTO}" \
+			'{"port": $rp ,"target": $ru , "protocol": $pr , "hostname": $oh}' )
 
-      
+ # un commet the following line for debuging 
+ #     echo "$JSONstring"
       curl -s -H "Content-type: application/json" -X POST -d "$JSONstring" $MY_URL

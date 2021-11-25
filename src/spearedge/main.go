@@ -14,7 +14,27 @@ import (
    "io/ioutil"
    "encoding/json"
    "time"
+   "crypto/rand"
 )
+
+const podIDChars = "1234567890abcdefghi"
+
+func GeneratePodid(length int)(string , error) {
+
+	buffer := make([]byte, length)
+	_ ,err := rand.Read(buffer)
+	if err != nil {
+		return "", err
+	}
+
+	podIDCharLength := len(podIDChars)
+	for i := 0; i < length; i++ {
+		buffer[i] = podIDChars[int(buffer[i])%podIDCharLength]
+	}
+
+	return string(buffer), nil
+
+}
 
 type SendInput struct {
 	Port string `json:"port"`
@@ -135,9 +155,6 @@ func checkport(w http.ResponseWriter, r *http.Request) {
 
     }
 
- //   port := input.Port
- //   target := input.Target
- //   protocol := input.Protocol
     hostname := input.Hostname
 
     podNs , found := os.LookupEnv("DST_NAMESPACE")
@@ -152,13 +169,22 @@ func checkport(w http.ResponseWriter, r *http.Request) {
     	podImage = "portcheck:latest"
     }
 
+	pod_name , err := GeneratePodid(6)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to Generate Pod Name\n")
+    	http.Error(w, "Unable to Generate Pod Name", http.StatusBadRequest)
+    	return
+	}    
+
+    pod_name = "portcheck-" + pod_name
+
     newPod := &corev1.Pod{
    	ObjectMeta: metav1.ObjectMeta{
-   		Name: "portcheck",
+   		Name: pod_name,
    	},
    	Spec: corev1.PodSpec{
    		Containers: []corev1.Container{
-   			{Name: "portcheck", Image: podImage, },
+   			{Name: pod_name, Image: podImage, },
    		},
    		NodeName: hostname,
    	},
@@ -182,9 +208,11 @@ func checkport(w http.ResponseWriter, r *http.Request) {
 
    podIP := "none"
 
-   for _ , pod := range pods.Items {
-   	if pod.Name == "portcheck" {
+   podloop:for _ , pod := range pods.Items {
+   	if pod.Name == pod_name {
    		podIP = pod.Status.PodIP
+   		break podloop
+
    	} 
    }
 
@@ -229,7 +257,7 @@ func checkport(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "error while getting a response %s", response.Status, http.StatusBadRequest)
 	}
 
-	delErr := clientset.CoreV1().Pods(podNs).Delete(context.TODO(), "portcheck", metav1.DeleteOptions{})
+	delErr := clientset.CoreV1().Pods(podNs).Delete(context.TODO(), pod_name, metav1.DeleteOptions{})
 
 	if delErr != nil {
   		log.Fatal(err)

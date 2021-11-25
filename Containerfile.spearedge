@@ -1,5 +1,5 @@
-FROM golang:alpine as build
-#FROM ubi8/go-toolset as build
+#FROM golang:alpine as build
+FROM ubi8/go-toolset as build
 
 WORKDIR /opt/app-root
 ENV GOPATH=/opt/app-root/
@@ -8,7 +8,7 @@ WORKDIR /opt/app-root/src/spearedge/
       
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /tmp/spearedge
 
-FROM scratch
+FROM ubi8/ubi-minimal
 
 WORKDIR /opt/app-root
 COPY --from=build /tmp/spearedge /opt/app-root/spearedge
