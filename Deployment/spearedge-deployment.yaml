@@ -16,12 +16,12 @@ spec:
     spec:
       containers:
       - name: spearedge
-        image: registry.gitlab.com/two.oes/portcheck/spearedge:latest
+        image: quay.io/two.oes/spearedge:latest
         env:
           - name: DST_NAMESPACE
             value: "port-check"
           - name: POD_IMAGE
-            value: "registry.gitlab.com/two.oes/portcheck/portcheck:latest"
+            value: "quay.io/two.oes/portcheck:latest"
           - name: PORT_NUMBER
             value: "8080"
           - name: INTERVAL_TIME

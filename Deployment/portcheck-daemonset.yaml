@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: portcheck
-        image: registry.gitlab.com/two.oes/portcheck/portcheck:latest
+        image: quay.io/two.oes/portcheck:latest
         ports:
         - name: http
           containerPort: 8080
