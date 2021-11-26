@@ -7,12 +7,6 @@ A simple Pod that get API POST request with port type and number with a target's
 
 There are a few ways of using the tool , I will try to go over all the posibilities for both connected and disconnected environment. 
 
-
-### Connected environment
-
-For a Connected Environment you can use the portcheck tool directly (with a deamonset deployment) or you can use it with spearedge which allows you to set one which host the Pod will be created and run the test from.
-
-
 #### Environment Variables
 
 Both packages has environment variables :
@@ -27,7 +21,13 @@ Both packages has environment variables :
   * INTERVAL_TIME - the number of seconds before spearedge will check the new Pod IP Address (Default : 10)
   * DST_NAMESPACE - the Namespace name on which the portcheck pod will be deployed (Need to setup the role an rolebinding accordingly)
   * POD_IMAGE - the the portcheck pod image to use when deploying the POD (this option is very useful for disconnected environments)
-  
+
+### Connected environment
+
+For a Connected Environment you can use the portcheck tool directly (with a deamonset deployment) or you can use it with spearedge which allows you to set one which host the Pod will be created and run the test from.
+
+
+
 #### Steps 
 
 The first step is to clone the git repository :
