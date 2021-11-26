@@ -12,6 +12,22 @@ There are a few ways of using the tool , I will try to go over all the posibilit
 
 For a Connected Environment you can use the portcheck tool directly (with a deamonset deployment) or you can use it with spearedge which allows you to set one which host the Pod will be created and run the test from.
 
+
+#### Environment Variables
+
+Both packages has environment variables :
+
+##### portcheck
+
+  * PORT_NUMBER - set the number of port portcheck will open a listening socket on 
+
+##### Spearedge
+
+  * PORT_NUMBER - set the number of port spearedge will open a listening socket on 
+  * INTERVAL_TIME - the number of seconds before spearedge will check the new Pod IP Address (Default : 10)
+  * DST_NAMESPACE - the Namespace name on which the portcheck pod will be deployed (Need to setup the role an rolebinding accordingly)
+  * POD_IMAGE - the the portcheck pod image to use when deploying the POD (this option is very useful for disconnected environments)
+  
 #### Steps 
 
 The first step is to clone the git repository :
@@ -44,7 +60,8 @@ And That is it !!!
 If you want to test it you can use the on of my test scripts :
 
     # export MY_URL="<the route URL>"
-    # export REMOTE_HOST="<Remote host/FQDN>"
+    # export REMOTE_HOST="<Remote FQDN>/portcheck"
+    # export REMOTE_PROTO=tcp
     # export DST_PORT="<port number>"
     # ./portcheck/test/test_portcheck.sh
 
@@ -93,6 +110,7 @@ Select on of the nodes and run the test :
     # export REMOTE_HOST="<Remote host>"
     # export DST_PORT="<Destination Port>"
     # export OCP_HOSTNAME="<one of the cluster workers>"
+    # export REMOTE_PROTO=tcp
     # ./test/test_spearedge.sh
 
 If you want to use it with a Web interface for delegation you can write it and just run the POST request from A web form

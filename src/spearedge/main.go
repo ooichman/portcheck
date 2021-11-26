@@ -15,6 +15,7 @@ import (
    "encoding/json"
    "time"
    "crypto/rand"
+   "strconv"
 )
 
 const podIDChars = "1234567890abcdefghi"
@@ -196,9 +197,16 @@ func checkport(w http.ResponseWriter, r *http.Request) {
    	panic(err)
    }
    
-   // wait 10 second for the pod to start 
+   // wait X second for the pod to start
 
-   time.Sleep(10 * time.Second)
+   interval := 10
+   interval_time, ierr := os.LookupEnv("INTERVAL_TIME")
+
+   if ierr {
+   	interval , err = strconv.Atoi(interval_time)
+   }
+
+   time.Sleep(time.Duration(interval) * time.Second)
 
    pods , err := clientset.CoreV1().Pods(podNs).List(context.TODO(), metav1.ListOptions{})
 
