@@ -50,26 +50,26 @@ usage(){
    fi
 
    if [[ -z ${REMOTE_HOST} ]]; then
-		echo "the variable REMOTE_HOST is not defined or the argument '-u' was not set "
+		echo "the variable REMOTE_HOST is not defined or the argument '-r' was not set "
                 usage
 		exit 1
    fi
 
    if [[ -z ${DST_PORT} ]]; then
-   	        echo "The variable DST_PORT is not defined"
+   	        echo "The variable DST_PORT is not defined or the argument '-n' was not set "
                 usage
    	        exit 1
    fi
 
    if [[ -z ${REMOTE_PROTO} ]]; then
 
-	        echo "The Variable REMOTE_PROTO is not definded"
+	        echo "The Variable REMOTE_PROTO is not definded or the argument '-p' was not set "
                 usage
  	        exit 1
    fi
 
    if [[ -z ${OCP_HOSTNAME} ]]; then
-		echo "the variable OCP_HOSTNAME is not defined"
+		echo "the variable OCP_HOSTNAME is not defined or the argument '-h' was not set "
                 usage
 		exit 1
    fi
