@@ -17,10 +17,13 @@ Both packages has environment variables :
 
 ##### Spearedge
 
-  * PORT_NUMBER - set the number of port spearedge will open a listening socket on 
+  * PORT_NUMBER - set the port number spearedge will open a listening socket on (need to update the deployment accordingly)
+
   * INTERVAL_TIME - the number of seconds before spearedge will check the new Pod IP Address (Default : 10)
+
   * DST_NAMESPACE - the Namespace name on which the portcheck pod will be deployed (Need to setup the role an rolebinding accordingly)
-  * POD_IMAGE - the the portcheck pod image to use when deploying the POD (this option is very useful for disconnected environments)
+  
+  * POD_IMAGE - the the portcheck pod image to use when deploying the POD (this option is for disconnected environments to )
 
 ### Connected environment
 
