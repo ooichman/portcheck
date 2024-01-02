@@ -13,6 +13,7 @@ spec:
       labels:
         app: portcheck
     spec:
+      serviceAccountName: portcheck
       containers:
       - name: portcheck
         image: registry.gitlab.com/two.oes/portcheck/portcheck:latest

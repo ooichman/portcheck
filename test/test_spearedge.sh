@@ -35,7 +35,7 @@ usage(){
 
    if [[ ${LIST_HOST} -eq 1 ]]; then
          if [[ ! -z ${MY_URL} ]]; then
-              curl -s -H "Content-type: application/json" -X GET $MY_URL/listnodes
+              curl -k -H "Content-type: application/json" -X GET $MY_URL/listnodes
               exit 0
          else
               echo "You need to use -l with the -u argument"
@@ -86,5 +86,5 @@ usage(){
 			'{"port": $rp ,"target": $ru , "protocol": $pr , "hostname": $oh}' )
 
  # un commet the following line for debuging 
- #     echo "$JSONstring"
-      curl -s -H "Content-type: application/json" -X POST -d "$JSONstring" $MY_URL
+      echo "$JSONstring" | jq
+      curl -k -H "Content-type: application/json" -X POST -d "$JSONstring" $MY_URL

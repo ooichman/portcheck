@@ -56,5 +56,5 @@ usage(){
                         --arg pr "${REMOTE_PROTO}" \
 			'{"port": $rp ,"target": $ru , "protocol": $pr}' )
 
-      
-          curl -s -H "Content-type: application/json" -X POST -d "$JSONstring" $MY_URL
+          echo $JSONstring | jq
+          curl -sk -H "Content-type: application/json" -X POST -d "$JSONstring" $MY_URL

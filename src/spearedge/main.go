@@ -55,6 +55,13 @@ type Postoutput struct {
 	Message string `json:"message"`
 }
 
+func intro(w http.ResponseWriter, r *http.Request ) {
+
+	fmt.Fprintf(w, "For testing add '/checkport' or '/listnodes' to the URL\n")
+	fmt.Fprintf(os.Stdout,"For testing add '/checkport' or '/listnodes' to the URL\n")
+	return
+}
+
 func listnodes(w http.ResponseWriter, r *http.Request) {
 
 	// login to kubernetes with the service account credentials
@@ -282,6 +289,7 @@ func main() {
 		port = "8080"
 	}
 
+    http.HandleFunc("/", intro)
 	http.HandleFunc("/listnodes", listnodes)
 	http.HandleFunc("/checkport", checkport)
 

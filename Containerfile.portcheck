@@ -1,5 +1,5 @@
-#FROM golang:alpine as build
-FROM ubi8/go-toolset as build
+FROM golang:alpine as build
+#FROM ubi8/go-toolset as build
 
 WORKDIR /opt/app-root
 ENV GOPATH=/opt/app-root/
@@ -7,8 +7,8 @@ COPY src src
 WORKDIR /opt/app-root/src/port-check/
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o portcheck
 
-#FROM ubi8/ubi-minimal
-FROM scratch 
+#FROM ubi9/ubi-minimal
+FROM scratch
 
 WORKDIR /opt/app-root
 COPY --from=build /opt/app-root/src/port-check/portcheck /opt/app-root/portcheck

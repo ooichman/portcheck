@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.fullnameOverride }}
+  labels:
+    app: {{ .Values.fullnameOverride }}
+spec:
+  replicas: {{  .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.fullnameOverride }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.fullnameOverride }}
+    spec:
+      containers:
+      - name: spearedge
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        env:
+        {{- range .Values.environment }}
+          - name: {{ .name | quote }}
+            value: {{ .value | quote }}
+        {{- end }}
+        ports:
+        - name: {{ .Values.ports.name }}
+          containerPort: {{ .Values.ports.containerPort }}
+          protocol: TCP
+      serviceAccountName: {{ .Values.serviceAccount.name }}

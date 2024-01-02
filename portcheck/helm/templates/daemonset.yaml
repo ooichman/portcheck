@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ .Values.fullname }}
+  labels:
+    app: {{ .Values.labels.app }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.labels.app }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.labels.app }}
+    spec:
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      containers:
+      - name: {{ .Values.fullname }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        ports:
+        - name: {{ .Values.portCheckPort.name }}
+          containerPort: {{ .Values.portCheckPort.containerPort }}
+          protocol: {{ .Values.portCheckPort.protocol }}

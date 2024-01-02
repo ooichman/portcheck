@@ -24,8 +24,8 @@ type Postoutput struct {
 
 func WebForm(w http.ResponseWriter, r *http.Request ) {
 
-	fmt.Fprintf(w, "Web Form under Constraction\n")
-	fmt.Fprintf(os.Stdout,"Web Form under Constraction\n")
+	fmt.Fprintf(w, "For testing add '/portcheck' to the URL\n")
+	fmt.Fprintf(os.Stdout,"For testing add '/portcheck' to the URL\n")
 	return
 }
 
