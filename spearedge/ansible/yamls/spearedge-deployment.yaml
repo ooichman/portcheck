@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spearedge
+  labels:
+    app: spearedge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spearedge
+  template:
+    metadata:
+      labels:
+        app: spearedge
+    spec:
+      containers:
+      - name: spearedge
+        image: registry.gitlab.com/two.oes/portcheck/spearedge:latest
+        env:
+          - name: DST_NAMESPACE
+            value: "port-check"
+          - name: POD_IMAGE
+            value: "registry.gitlab.com/two.oes/portcheck/portcheck:latest"
+          - name: PORT_NUMBER
+            value: "8080"
+          - name: INTERVAL_TIME
+            value: "5"
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+      serviceAccountName: spearedge

@@ -1,0 +1,78 @@
+---
+- name: authentication to OpenShift
+  hosts: localhost
+  become: false
+  gather_facts: false
+  tasks:
+  - name: running the login command for the openshift Server
+    redhat.openshift.openshift_auth:
+      host: "{{ cluster_api }}"
+      username: "{{ cluster_username }}"
+      password: "{{ cluster_pass }}"
+      validate_certs: false
+    register: auth_results
+
+- name: starting the Application deployment
+  hosts: localhost
+  become: false
+  gather_facts: false
+  module_defaults:
+    group/redhat.openshift.openshift:
+      namespace: port-check
+      api_key: "{{ auth_results['openshift_auth']['api_key'] }}"
+      validate_certs: false
+    group/kubernetes.core.k8s:
+      namespace: port-check
+      api_key: "{{ auth_results['openshift_auth']['api_key'] }}"
+      validate_certs: false
+  tasks:
+    - name: Make sure the Project exists
+      kubernetes.core.k8s:
+        state: present
+        resource_definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: port-check
+      ignore_errors: true
+
+    - name: deploying the service account
+      kubernetes.core.k8s:
+        state: present
+        src: serviceAccount.yaml
+
+    - name: deploying the portcheck service
+      kubernetes.core.k8s:
+        state: present
+        src: service.yaml
+
+    - name: deploying the application daemonset
+      kubernetes.core.k8s:
+        state: present
+        src: daemonset.yaml
+
+    - name: deploying the route for the  port check application
+      kubernetes.core.k8s:
+        state: present
+        template: 'files/ingress.yaml'
+
+    - name: getting the route information 
+      kubernetes.core.k8s_info:
+        api_version: networking.k8s.io/v1
+        kind: Ingress
+        name: portcheck
+      register: route_info
+
+    - name: showing the route information
+      ansible.builtin.debug:
+        msg: "{{ route_info.resources[0].spec.rules[0].host }}"
+
+    - name: testing the port is open
+      ansible.builtin.uri:
+        url: "http://{{ route_info.resources[0].spec.rules[0].host }}/portcheck"
+        method: POST
+        body: "{{ lookup('ansible.builtin.file','request.json') }}"
+        status_code: 200
+        body_format: json
+        headers:
+          Content-Type: application/json

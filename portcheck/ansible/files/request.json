@@ -1,0 +1,5 @@
+{
+   "port": "6443",
+   "target": "api.cluster-8m9nn.8m9nn.sandbox182.opentlc.com", 
+    "protocol": "tcp"
+}

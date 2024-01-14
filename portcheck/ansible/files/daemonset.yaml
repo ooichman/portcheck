@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: portcheck
+  labels:
+    app: portcheck
+spec:
+  selector:
+    matchLabels:
+      app: portcheck
+  template:
+    metadata:
+      labels:
+        app: portcheck
+    spec:
+      serviceAccountName: portcheck
+      containers:
+      - name: portcheck
+        image: registry.gitlab.com/two.oes/portcheck/portcheck:latest
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP

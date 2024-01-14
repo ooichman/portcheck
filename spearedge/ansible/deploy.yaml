@@ -1,0 +1,75 @@
+---
+- name: logging in to Openshift/Kubernetes
+  hosts: localhost
+  become: false
+  gather_facts: false
+  tasks:
+    - name: running the login command.
+      kubernetes.core.k8s_auth:
+        host: "{{ cluster_api }}"
+        username: "{{ cluster_username }}"
+        password: "{{ cluster_pass }}"
+        validate_certs: false
+      register: server_auth
+
+- name: running the portcheck deployment 
+  hosts: localhost
+  become: false
+  gather_facts: false
+  module_defaults:
+    group/kubernetes.core.k8s:
+      namespace: "{{ namespace }}"
+      validate_certs: false
+      api_key: "{{ server_auth['openshift_auth']['api_key'] }}"
+      host: "{{ cluster_api }}"
+  tasks:
+    - name: Making sure the namespace is present
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: "{{ namespace }}"
+            labels:
+              openshift.io/cluster-monitoring: "true"
+
+    - name: Creating the Service account 
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup ('file','yamls/serviceaccount.yaml') | from_yaml }}"
+
+    - name: create a cluster role
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup ('file','yamls/clusterRole-listNodes.yaml') | from_yaml }}"
+
+    - name: create a cluster role binding
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup ('file','yamls/clusterRoleBinding.yaml') | from_yaml }}"
+
+    - name: Creating a Role to allow spearedge to creating a Pod
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup ('file','yamls/role-pods.yaml') | from_yaml }}"
+
+    - name: creating the Role Binding for spearedge 
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup ('file','yamls/rolePodBinding.yaml') | from_yaml }}"
+
+    - name: Creating the Spearedge Service 
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup ('file','yamls/spearedge-svc.yaml') | from_yaml }}"
+
+    - name: Creating the Spearedge deployment
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup ('file','yamls/spearedge-deployment.yaml') | from_yaml }}"
+
+    - name: Creating the application ingress
+      kubernetes.core.k8s:
+        state: present
+        template: 'yamls/spearedge-ingress.yaml'

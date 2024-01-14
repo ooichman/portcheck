@@ -1,0 +1,9 @@
+[localhost]
+localhost ansible_connection=local
+
+[all:vars]
+cluster_api=
+cluster_username=
+cluster_pass=
+namespace=
+spearedge_hostname=
